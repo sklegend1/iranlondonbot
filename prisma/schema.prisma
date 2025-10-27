@@ -1,0 +1,180 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  //output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  telegramId    BigInt   @unique
+  username      String?  
+  firstName     String?
+  lastName      String?
+  isAdmin       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  ads           Ad[]
+  botSettings   BotSetting[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  price Float
+  ads   Ad[]
+}
+
+model Ad {
+  id         Int      @id @default(autoincrement())
+  messageId  Int?      
+  content    String
+  imageUrl   String?   // optional field for ad image
+  categoryId Int
+  userId     Int
+  startAt    DateTime
+  endAt      DateTime
+  createdAt  DateTime @default(now())
+  verified   Boolean @default(false)
+  receiptUrl String?  // optional field for payment receipt
+  receiptText String? // optional field for payment receipt text
+  category Category @relation(fields: [categoryId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+model Group {
+  id        Int      @id @default(autoincrement())
+  title     String
+  telegramId String   @unique
+  createdAt DateTime @default(now())
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  title       String
+  link        String   @unique
+  content     String
+  image       String?
+  source      String
+  publishedAt DateTime
+  createdAt   DateTime @default(now())
+  posted      Boolean  @default(false)
+}
+
+model Operator {
+  id           Int       @id @default(autoincrement())
+  name         String    @unique
+  session      String    // StringSession value (store securely)
+  phone        String?
+  enabled      Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  apiId        Int
+  apiHash      String
+  accessHashes AccessHash[]
+  invites      InviteLog[]
+}
+
+model ScrapedUser {
+  id          Int      @id @default(autoincrement())
+  userId      BigInt   @unique
+  username    String?
+  firstName   String?
+  lastName    String?
+  added       Json     @default("{}") // per-target group statuses
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  accessHashes AccessHash[]
+  invites      InviteLog[]
+}
+
+model AccessHash {
+  id         Int     @id @default(autoincrement())
+  userId     BigInt
+  operatorId Int
+  // store as string to avoid precision loss
+  accessHash String
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  user     ScrapedUser @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  operator Operator    @relation(fields: [operatorId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, operatorId])
+  @@index([operatorId])
+  @@index([userId])
+}
+
+model InviteLog {
+  id         Int      @id @default(autoincrement())
+  operatorId Int?
+  userId     BigInt?
+  groupKey   String?   // logical name or identifier of target group
+  status     String    // success | failed | skipped
+  method     String?   // username | input_user | invite_link_sent
+  reason     String?   // any failure reason
+  createdAt  DateTime @default(now())
+
+  operator Operator? @relation(fields: [operatorId], references: [id])
+  user     ScrapedUser? @relation(fields: [userId], references: [userId])
+  @@index([operatorId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model TargetGroup {
+  id          Int       @id @default(autoincrement())
+  key         String    @unique   // e.g. "group_marketing"
+  username    String?              // @groupusername or invite link
+  title       String?
+  memberCount Int? 
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  members TargetGroupMember[]
+}
+
+model TargetGroupMember {
+  id            Int        @id @default(autoincrement())
+  groupId       Int
+  userId        BigInt
+  username      String?
+  firstName     String?
+  lastName      String?
+  status        String     // active | kicked | left | banned | unknown
+  lastSeen      DateTime? 
+  joinedAt      DateTime?  @default(now())
+  updatedAt     DateTime   @updatedAt
+  canShareLinks Boolean? @default(false)
+  addedBy       Int?       // references userId
+  group TargetGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+}
+
+model BotSetting {
+  key        String   @id
+  value      String
+  updatedAt  DateTime @updatedAt
+  updatedBy  Int?     // references User.id
+  updatedByUser User? @relation(fields: [updatedBy], references: [id])
+}
+
+model RssSource {
+  id          Int       @id @default(autoincrement())
+  title       String
+  url         String    @unique
+  active      Boolean   @default(true)
+  lastChecked DateTime? 
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+}

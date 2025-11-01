@@ -18,6 +18,7 @@ import { fetchMembersWithFallback } from "./utils/fetchMembersWithFallback";
 import { PrismaScrapedUserRepository } from "../../db/repositories/PrismaScrapedUserRepository";
 import { toBigIntOrLong } from "../../helpers/ToBigIntOrLong";
 import { PrismaAccessHashRepository } from "../../db/repositories/PrismaAccessHashRepository";
+import { PrismaBotSettingRepository } from "../../db/repositories/PrismaBotSettingRepository";
 const input = require("input"); // npm install input
 
 require("dotenv").config();
@@ -35,7 +36,7 @@ const minDelayMs = Number(process.env.MIN_DELAY_MS) || 180 * 1000; // at least 3
 const prisma = new PrismaClient();
 const repo = new PrismaScrapedUserRepository();
 const accessHashRepo = new PrismaAccessHashRepository();
-
+const botSettingRepo = new PrismaBotSettingRepository();
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -112,7 +113,7 @@ function buildInviteTargetForUser(user: any) {
 
 
 // --------- Main ----------
-export async function addGroupUsersToDB(apiId : number, apiHash : string) {
+export async function addGroupUsersToDB(apiId : number, apiHash : string,opId: number , sessionString:string) {
   if (!apiId || !apiHash) {
     console.error("TELEGRAM_API_ID and TELEGRAM_API_HASH must be set in .env");
     process.exit(1);
@@ -132,45 +133,51 @@ export async function addGroupUsersToDB(apiId : number, apiHash : string) {
 
   console.log("✅ Logged in (session active).");
 
-  const operatorIdText = await input.text("Enter your local operator id (optional): ");
-  const operatorId = operatorIdText ? Number(operatorIdText) : -1;
+  //const operatorIdText = await input.text("Enter your local operator id (optional): ");
+  const operatorId = opId
 
-  const oldGroup = await input.text("Enter OLD group username or invite link (without @ for username): ");
-  const newGroup = await input.text("Enter NEW group username or invite link (without @ for username): ");
+  const groupArr = await botSettingRepo.getValue("ref_groups");
+  const oldGroups = JSON.parse(groupArr?.value || "[]") as string[];
+  //const oldGroup = await input.text("Enter OLD group username or invite link (without @ for username): ");
+  //const newGroup = await input.text("Enter NEW group username or invite link (without @ for username): ");
 
   // Resolve entities (getEntity works for usernames or invite link InputPeer/Channel)
   let oldEntity: any;
-  let newEntity: any;
-  try {
-    oldEntity = await client.getEntity(oldGroup);
-    newEntity = await client.getEntity(newGroup);
-  } catch (err: any) {
-    console.error("Failed to resolve group entities:", err);
-    await client.disconnect();
-    process.exit(1);
-  }
+  //let newEntity: any;
+  for (const oldGroup of oldGroups){    
+      try {
 
-  console.log("Fetching participants from old group (this may take a while)...");
-  //const oldUsers = await fetchAllParticipants(client, oldEntity);
-  const oldUsers = await fetchMembersWithFallback(client, oldEntity); // fetch up to 10k messages
-  console.log(`Found ${oldUsers.length} users in the source group.`);
-  // const newUsers = await fetchMembersWithFallback(client, newEntity);
-  // const allUsers =oldUsers.filter((id) => !newUsers.includes(id));
-  const allUsers = oldUsers
-  console.log(`Found ${allUsers.length} users in the source group.`);
-  
-  try {
-    //console.log(Object.keys(allUsers[2]))
-    for (const tgUser of allUsers){
-      //console.log(tgUser)
-      await repo.upsertUser(tgUser)
-      await accessHashRepo.upsert((tgUser.userId),operatorId!, tgUser.accessHash ?? tgUser.access_hash ?? tgUser.accessHashBigInt)
+        oldEntity = await client.getEntity(oldGroup);
+        console.log(`Resolved old group entity for ${oldEntity.title || oldGroup}`);
+        //newEntity = await client.getEntity(newGroup);
+      } catch (err: any) {
+        console.error("Failed to resolve group entities:", err);
+        await client.disconnect();
+        process.exit(1);
+      }
 
-    }
-    console.log(`${allUsers.length} members successfuly added to database`)
-    
-  } catch (error) {
-    console.log(error)
+      console.log("Fetching participants from old group (this may take a while)...");
+      //const oldUsers = await fetchAllParticipants(client, oldEntity);
+      const oldUsers = await fetchMembersWithFallback(client, oldEntity); // fetch up to 10k messages
+      console.log(`Found ${oldUsers.length} users in the source group.`);
+      // const newUsers = await fetchMembersWithFallback(client, newEntity);
+      // const allUsers =oldUsers.filter((id) => !newUsers.includes(id));
+      const allUsers = oldUsers
+      console.log(`Found ${allUsers.length} users in the source group.`);
+      
+      try {
+        //console.log(Object.keys(allUsers[2]))
+        for (const tgUser of allUsers){
+          //console.log(tgUser)
+          await repo.upsertUser(tgUser)
+          await accessHashRepo.upsert((tgUser.userId),operatorId!, tgUser.accessHash ?? tgUser.access_hash ?? tgUser.accessHashBigInt)
+
+        }
+        console.log(`${allUsers.length} members successfuly added to database`)
+        
+      } catch (error) {
+        console.log(error)
+      }
   }
 //   for (const user of allUsers) {
 //     try {
@@ -271,8 +278,8 @@ export async function addGroupUsersToDB(apiId : number, apiHash : string) {
   console.log("Completed transfer loop. Disconnecting...");
   await client.disconnect();
   await prisma.$disconnect();
-  process.exit(0);
+  //process.exit(0);
 };
 
 
-   addGroupUsersToDB(apiId, apiHash)
+   //addGroupUsersToDB(apiId, apiHash)

@@ -9,18 +9,20 @@ export class ScheduleAdJobs {
     console.log(`[Scheduler] Ad ${ad.id} will be sent in ${delayUntilStart / 1000}s`);
     console.log(`[Scheduler] Ad ${ad.id} will be deleted in ${delayUntilEnd / 1000}s`);
 
+    console.log(`[Scheduler] Connected to Redis for queue: ${adQueue.name}`);
     // Schedule "send"
     await adQueue.add(
       "sendAd",
       { type: "send", ad },
-      { delay: delayUntilStart, attempts: 3 }
+      { delay: Math.max(0,delayUntilStart), attempts: 3 }
     );
+    console.log(`[Scheduler] Job "sendAd" added for Ad ${ad.id} with delay ${delayUntilStart}ms`);
 
     // Schedule "delete"
     await adQueue.add(
       "deleteAd",
       { type: "delete", ad },
-      { delay: delayUntilEnd, attempts: 3 }
+      { delay: Math.max(0,delayUntilEnd), attempts: 3 }
     );
   }
 }

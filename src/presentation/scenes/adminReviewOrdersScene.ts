@@ -2,9 +2,10 @@ import { Scenes, Markup } from "telegraf";
 import { MyContext } from "../types/MyContext";
 import { PrismaAdRepository } from "../../infrastructure/db/repositories/PrismaAdRepository";
 import { format } from "date-fns-jalali";
+import { ScheduleAdJobs } from "../../application/use-cases/ScheduleAdJobs";
 
 const adRepo = new PrismaAdRepository();
-
+const scheduler = new ScheduleAdJobs();
 export const adminReviewOrdersScene = new Scenes.BaseScene<any>("ADMIN_REVIEW_ORDERS_SCENE");
 
 // وقتی وارد صحنه می‌شود
@@ -78,6 +79,7 @@ adminReviewOrdersScene.on("text", async (ctx) => {
   switch (text) {
     case "✅ تأیید تبلیغ":
       await adRepo.update( {...ad , verified: true });
+      await scheduler.execute(ad);
       await ctx.reply("✅ تبلیغ تأیید و فعال شد.");
       i++;
       ctx.scene.session.index = i;

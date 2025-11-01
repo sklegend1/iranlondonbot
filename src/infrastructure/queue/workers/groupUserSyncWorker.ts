@@ -22,7 +22,7 @@ export const groupUserSyncWorker = new Worker(
     for (const op of operators) {
       try {
         console.log(`👤 Syncing for operator ${op.name || op.id}`);
-        await addGroupUsersToDB(op.apiId, op.apiHash);
+        await addGroupUsersToDB(op.apiId, op.apiHash,op.id,op.session);
         console.log(`✅ Done for ${op.name || op.id}`);
       } catch (err) {
         console.error(`❌ Failed for ${op.name || op.id}:`, err);

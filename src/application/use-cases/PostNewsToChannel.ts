@@ -13,7 +13,7 @@ export class PostNewsToChannel {
     for (const news of newsList) {
         //console.log(`Processing news from: ${news.source}`);
         let image = news.image;
-        if(news.source === 'BBC Persian' && image ){
+        if(news.source.includes('BBC') && image ){
             image = image.replace('/240/','/720/');
         }
         // else if(news.source === 'The Guardian' && image){

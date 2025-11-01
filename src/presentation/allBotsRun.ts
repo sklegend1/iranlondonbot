@@ -2,7 +2,8 @@ import { Context, Scenes, Telegraf } from "telegraf";
 import { setupAdminBot } from "./adminBot";
 import { setupGroupBot } from "./groupBot";
 import { PrismaBotSettingRepository } from "../infrastructure/db/repositories/PrismaBotSettingRepository";
-
+import { groupUserSyncWorker } from "../infrastructure/queue/workers/groupUserSyncWorker";
+import { inviteWorker } from "../infrastructure/queue/workers/inviteWorker";
 type MySession = Scenes.SceneSession & {
     wizardData?: Record<string, any>;
   };

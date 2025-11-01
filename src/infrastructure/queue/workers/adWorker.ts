@@ -4,21 +4,28 @@ import { redisOptions } from "../queueClient";
 import { TelegramService } from "../../telegram/TelegramService";
 import { UpdateAd } from "../../../application/use-cases/UpdateAd";
 import { PrismaAdRepository } from "../../db/repositories/PrismaAdRepository";
+import { PrismaBotSettingRepository } from "../../db/repositories/PrismaBotSettingRepository";
 require('dotenv').config();
 
-const telegramService = new TelegramService(
-  process.env.TELEGRAM_BOT_TOKEN!,
-  process.env.TELEGRAM_CHANNEL_ID!
-);
+// const telegramService = new TelegramService(
+//   process.env.TELEGRAM_BOT_TOKEN!,
+//   process.env.TELEGRAM_CHANNEL_ID!
+// );
 
 const adRepository = new PrismaAdRepository();
 const updateAdUseCase = new UpdateAd(adRepository);
+const botSettingRepo = new PrismaBotSettingRepository();
 // Worker to process ad jobs
 export const adWorker = new Worker(
   "ads",
   async (job) => {
+    console.log(`[Worker] Listening to queue: ads`);
     const { type, ad } = job.data;
-
+    const channelId = (await botSettingRepo.getValue("main_channel"))?.value
+    const telegramService = new TelegramService(
+      process.env.TELEGRAM_BOT_TOKEN!,
+      channelId || process.env.TELEGRAM_CHANNEL_ID!
+    );
     if (type === "send") {
       console.log(`[Queue] Sending ad ${ad.id}`);
       const messageId = await telegramService.sendAd(ad.content, ad.imageUrl);

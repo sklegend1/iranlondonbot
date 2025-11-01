@@ -17,6 +17,7 @@ import { renewAdScene } from "./scenes/renewAdScene";
 import { adminReviewOrdersScene } from "./scenes/adminReviewOrdersScene";
 import { botSettingsScene } from "./scenes/botSettingsScene";
 
+
 const prisma = new PrismaClient();
 const settingService = new BotSettingService();
 const rssParser = new Parser();
@@ -44,13 +45,15 @@ export const adminBotStartHandler = async (ctx:any) => {
   const fromId = ctx.from?.id?.toString() ?? "";
   ctx.session = {};
   const curUser = await userRepo.findByTelegramId(ctx.from?.id);
+  
+  
 
   if (fromId !== ADMIN_ID && (!curUser || !curUser.isAdmin)) {
     //await ctx.reply("⛔️ شما اجازه‌ی دسترسی به این ربات را ندارید.");
     //return;
     const from = ctx.from;
-    if (!from) return ctx.reply("❌ خطا در شناسایی کاربر.");
-  
+  if (!from) return ctx.reply("❌ خطا در شناسایی کاربر.");
+    console.log(ctx.from)
     // save or update user in DB
     const user = await userRepo.createOrUpdate({
       telegramId: from.id,
@@ -61,7 +64,16 @@ export const adminBotStartHandler = async (ctx:any) => {
     await ctx.scene.enter("NORMAL_USER_SCENE");
   }
   else{
-    
+    const from = ctx.from;
+  //if (!from) return ctx.reply("❌ خطا در شناسایی کاربر.");
+    console.log(ctx.from)
+    // save or update user in DB
+    const user = await userRepo.createOrUpdate({
+      telegramId: from.id,
+      username: from.username,
+      firstName: from.first_name,
+      lastName: from.last_name,
+    });
     await ctx.reply("👋 سلام ادمین! یکی از گزینه‌ها را انتخاب کن:", mainMenuKeyboard());
   }
   

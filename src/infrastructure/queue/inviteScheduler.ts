@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Queue } from "bullmq";
 import { redisOptions } from "./queueClient";
-
+import "dotenv/config";
 
 const prisma = new PrismaClient();
 export const inviteQueue = new Queue("inviteQueue", { connection:redisOptions });
@@ -19,7 +19,7 @@ export async function scheduleInviteJobs() {
       `invite_${group.key}`,
       { target: group.key },
       {
-        repeat: { every: 24 * 60 * 60 * 1000 }, // هر ۶ ساعت
+        repeat: { every: (Number(process.env.INVITE_WAITING_TIME!)||24) * 60 * 60 * 1000 }, // هر ۶ ساعت
         removeOnComplete: true,
         removeOnFail: false,
       }

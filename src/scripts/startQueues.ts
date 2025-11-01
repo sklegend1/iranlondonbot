@@ -5,8 +5,8 @@ import "../infrastructure/queue/workers/currencyWorker";
 
 (async () => {
   // Setup repeatable jobs (change cron expressions as you need)
-  await scheduleRepeatableNewsFetch("*/2 * * * *"); // every 15 minutes
-  await scheduleRepeatableCurrencyJob("*/3 * * * *"); // every hour at :00
+  await scheduleRepeatableNewsFetch("*/15 * * * *"); // every 15 minutes
+  await scheduleRepeatableCurrencyJob("0 * * * *"); // every hour at :00
 
   // Optionally trigger immediate runs for testing:
   //await enqueueNewsFetchOnce();

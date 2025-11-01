@@ -26,6 +26,8 @@ async function getCandidatesWithAccessHash(operatorId: number, limit = 200) {
       include: { user: true }, // user is ScrapedUser
     });
     // rows[i].user is the ScrapedUser
+    console.log(`Found ${rows.length} candidate users with access hash for operator ${operatorId}.`);
+    //console.log(rows)
     return rows.map(r => ({ accessHashRow: r, user: r.user }));
   }
 
@@ -91,7 +93,7 @@ for (const { accessHashRow, user } of candidateRows) {
 
   // 3) check invite logs for success by this operator & group
   const prevInvite = await prisma.inviteLog.findFirst({
-    where: { operatorId: op.id, userId: user.userId, groupKey: group.key}
+    where: {  userId: user.userId, groupKey: group.key}
   });
   if (prevInvite) continue;
 
@@ -134,6 +136,7 @@ if (!nextUser) {
 
       console.log(`Inviting ${nextUser.user.username || nextUser.user.userId} using ${op.name}...`);
 
+      console.log(nextUser)
       await client.invoke(
         new Api.channels.InviteToChannel({
           channel,
@@ -161,6 +164,10 @@ if (!nextUser) {
         },
       });
 
+      await prisma.accessHash.delete({
+        where: { id: nextUser.accessHashRow.id },
+      })
+
       console.log(`✅ Successfully invited ${nextUser.user.username || nextUser.user.userId}`);
 
       // Wait random delay before next attempt
@@ -169,7 +176,10 @@ if (!nextUser) {
       await new Promise((r) => setTimeout(r, delay));
     } catch (error: any) {
       console.error(`❌ Error inviting user ${nextUser.user.userId} by ${op.name}: ${error.message}`);
-
+      if (error.message.includes("FLOOD_WAIT") || error.message.includes("PEER_FLOOD")) {
+        console.warn(`⚠️ Operator ${op.name} hit rate limit. Skipping temporarily.`);
+        continue; // move to next operator
+      }
       await prisma.inviteLog.create({
         data: {
           operatorId: op.id,
@@ -180,10 +190,7 @@ if (!nextUser) {
         },
       });
 
-      if (error.message.includes("FLOOD_WAIT") || error.message.includes("PEER_FLOOD")) {
-        console.warn(`⚠️ Operator ${op.name} hit rate limit. Skipping temporarily.`);
-        continue; // move to next operator
-      }
+      
     } finally {
       await client.disconnect();
     }

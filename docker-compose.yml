@@ -1,0 +1,160 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+    command: node dist/presentation/allBotsRun.js
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep node || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    ports:
+      - "5050:80" # Expose pgAdmin on port 5050
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com # Default login email
+      PGADMIN_DEFAULT_PASSWORD: admin        # Default login password
+    depends_on:
+      - postgres
+
+  ad-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ad-worker
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: node dist/infrastructure/queue/workers/adWorker.js
+
+  queue-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: queue-scheduler
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+    command: node dist/scripts/startQueues.js
+
+  group-user-sync-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: group-user-sync-scheduler
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+    command: node -e "import('./dist/infrastructure/queue/groupUserSyncScheduler.js').then(m => m.scheduleGroupUserSync())"
+
+  invite-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: invite-scheduler
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+    command: node -e "import('./dist/infrastructure/queue/inviteScheduler.js').then(m => m.scheduleInviteJobs())"
+
+  target-sync-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: target-sync-scheduler
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+    command: node -e "import('./dist/infrastructure/queue/syncTargetQueue.js').then(m => m.scheduleTargetGroupSync())"
+
+  target-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: target-worker
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: node dist/infrastructure/queue/workers/targetGroupSyncWorker.js
+  
+  group-sync-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: group-sync-worker
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: node dist/infrastructure/queue/workers/groupUserSyncWorker.js
+
+  invite-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: invite-worker
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: node dist/infrastructure/queue/workers/inviteWorker.js
+
+  bullboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: redis-monitor
+    command: node dist/monitor.js
+    ports:
+      - "3001:3001"
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:

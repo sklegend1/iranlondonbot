@@ -1,5 +1,5 @@
 import { groupUserSyncQueue } from "./groupUserSyncQueue";
-
+import "dotenv/config";
 export async function scheduleGroupUserSync() {
   console.log("🕐 Scheduling recurring group user sync job...");
 
@@ -8,7 +8,7 @@ export async function scheduleGroupUserSync() {
     "syncAllOperators",
     {},
     {
-      repeat: { every: 2 * 60 * 60 * 1000 }, // هر ۲ ساعت
+      repeat: { every: (Number(process.env.SYNC_USERS_WAITING_TIME!)||48) * 60 * 60 * 1000 }, // هر ۲ ساعت
       removeOnComplete: true,
       removeOnFail: false,
       

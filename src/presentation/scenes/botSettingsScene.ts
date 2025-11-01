@@ -52,7 +52,7 @@ async function handleAddAdmin(ctx: any, text: string) {
     const curUser = await userRepo.findByTelegramId(ctx.from?.id);
     await settingRepo.upsert(key, JSON.stringify(groups),curUser?curUser.id :0 );
     if(key==="our_groups"){
-        await targetRepo.upsertGroup({key:text})
+        await targetRepo.upsertGroup({key:text,username:`@${text}`})
     }
     ctx.scene.state = {};
   }

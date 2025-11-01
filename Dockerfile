@@ -36,8 +36,8 @@
     # Install only production dependencies
     RUN npm ci --omit=dev
     
-    # Generate Prisma client for runtime
-    RUN npx prisma generate
+    # # Generate Prisma client for runtime
+    # RUN npx prisma generate
     
     # Expose the application port
     EXPOSE 3000

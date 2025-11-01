@@ -23,24 +23,19 @@
     # Runtime Stage
     # ----------------------------
     FROM node:20-alpine
-    
-    # Set working directory
+
     WORKDIR /app
-    
-    # Copy built files and runtime dependencies
+
     COPY --from=builder /app/dist ./dist
     COPY --from=builder /app/node_modules ./node_modules
     COPY package*.json ./
     COPY prisma ./prisma
-    
-    # Install only production dependencies
-    RUN npm ci --omit=dev
-    
-    # # Generate Prisma client for runtime
-    # RUN npx prisma generate
-    
-    # Expose the application port
+    COPY wait-for-db.sh ./
+
+    RUN npm ci --omit=dev \
+        && npx prisma generate \
+        && chmod +x wait-for-db.sh
+
     EXPOSE 3000
-    
-    # Default command (can be overridden in docker-compose.yml)
-    CMD ["node", "dist/presentation/allBotsRun.js"]
+
+    CMD ["./wait-for-db.sh"]

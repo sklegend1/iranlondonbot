@@ -1,5 +1,4 @@
 
-
 services:
   app:
     build:
@@ -11,11 +10,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - redis
-      - postgres
-    command: sh -c "npx prisma migrate deploy && node dist/presentation/allBotsRun.js"
-    restart: always
-    
+      postgres:
+        condition: service_healthy
+    command: sh -c "./wait-for-db.sh"
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
@@ -23,6 +21,7 @@ services:
     ports:
       - "6379:6379"
     command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    restart: unless-stopped
 
   postgres:
     image: postgres:15-alpine
@@ -36,21 +35,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 15
+      start_period: 10s
+    restart: unless-stopped
 
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
     ports:
-      - "5050:80" # Expose pgAdmin on port 5050
+      - "5050:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com # Default login email
-      PGADMIN_DEFAULT_PASSWORD: admin        # Default login password
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
   ad-worker:
     build:
@@ -62,6 +65,7 @@ services:
     depends_on:
       - redis
     command: node dist/infrastructure/queue/workers/adWorker.js
+    restart: unless-stopped
 
   queue-scheduler:
     build:
@@ -74,6 +78,7 @@ services:
       - redis
       - postgres
     command: node dist/scripts/startQueues.js
+    restart: unless-stopped
 
   group-user-sync-scheduler:
     build:
@@ -86,6 +91,7 @@ services:
       - redis
       - postgres
     command: node -e "import('./dist/infrastructure/queue/groupUserSyncScheduler.js').then(m => m.scheduleGroupUserSync())"
+    restart: unless-stopped
 
   invite-scheduler:
     build:
@@ -98,6 +104,7 @@ services:
       - redis
       - postgres
     command: node -e "import('./dist/infrastructure/queue/inviteScheduler.js').then(m => m.scheduleInviteJobs())"
+    restart: unless-stopped
 
   target-sync-scheduler:
     build:
@@ -110,6 +117,7 @@ services:
       - redis
       - postgres
     command: node -e "import('./dist/infrastructure/queue/syncTargetQueue.js').then(m => m.scheduleTargetGroupSync())"
+    restart: unless-stopped
 
   target-worker:
     build:
@@ -121,7 +129,8 @@ services:
     depends_on:
       - redis
     command: node dist/infrastructure/queue/workers/targetGroupSyncWorker.js
-  
+    restart: unless-stopped
+
   group-sync-worker:
     build:
       context: .
@@ -132,6 +141,7 @@ services:
     depends_on:
       - redis
     command: node dist/infrastructure/queue/workers/groupUserSyncWorker.js
+    restart: unless-stopped
 
   invite-worker:
     build:
@@ -143,6 +153,7 @@ services:
     depends_on:
       - redis
     command: node dist/infrastructure/queue/workers/inviteWorker.js
+    restart: unless-stopped
 
   bullboard:
     build:
@@ -156,6 +167,7 @@ services:
       - REDIS_HOST=redis
     depends_on:
       - redis
+    restart: unless-stopped
 
 volumes:
   postgres_data:

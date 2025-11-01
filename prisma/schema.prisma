@@ -50,12 +50,7 @@ model Ad {
   user     User     @relation(fields: [userId], references: [id])
 }
 
-model Group {
-  id        Int      @id @default(autoincrement())
-  title     String
-  telegramId String   @unique
-  createdAt DateTime @default(now())
-}
+
 
 model News {
   id          Int      @id @default(autoincrement())

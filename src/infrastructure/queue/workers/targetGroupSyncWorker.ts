@@ -19,7 +19,8 @@ export const targetGroupSyncWorker = new Worker(
   async (job: Job) => {
     console.log(`🚀 Running job ${job.id} - Sync group users`);
     const client = new TelegramClient(stringSession, apiId, apiHash!, {
-        connectionRetries: 5,
+        connectionRetries: 999,
+        timeout: 30
       });
     
       console.log("Connecting to Telegram...");

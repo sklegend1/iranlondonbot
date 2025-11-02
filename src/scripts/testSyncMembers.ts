@@ -9,7 +9,8 @@ const apiHash = process.env.TELEGRAM_API_HASH0;
   const stringSession = new StringSession(process.env.TELEGRAM_STRING_SESSION0!);
 
   const client = new TelegramClient(stringSession, apiId, apiHash!, {
-    connectionRetries: 5,
+    connectionRetries: 999,
+        timeout: 30
   });
 
   console.log("Connecting to Telegram...");

@@ -33,7 +33,9 @@ function toBigIntSafe(v: any) {
 }
 
 async function createClientForOperator(sessionString: string, apiId: number, apiHash: string) {
-  const client = new TelegramClient(new StringSession(sessionString), apiId, apiHash, { connectionRetries: 5 });
+  const client = new TelegramClient(new StringSession(sessionString), apiId, apiHash, 
+  { connectionRetries: 999,
+    timeout: 30 });
   await client.connect();
   return client;
 }

@@ -117,7 +117,8 @@ if (!nextUser) {
       new StringSession(op.session),
       op.apiId,
       op.apiHash,
-      { connectionRetries: 3 }
+      { connectionRetries: 999,
+        timeout: 30 }
     );
 
     try {

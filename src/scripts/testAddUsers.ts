@@ -15,7 +15,8 @@ import "dotenv/config";
     //await input.text("Enter NEW group username or invite link (without @ for username): "); // username or id
 
     const client = new TelegramClient(new StringSession(sessionString), apiId, apiHash, {
-      connectionRetries: 5,
+      connectionRetries: 999,
+        timeout: 30
     });
 
     console.log("Connecting client...");

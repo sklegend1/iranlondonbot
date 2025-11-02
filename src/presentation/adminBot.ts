@@ -399,7 +399,8 @@ const addOperatorWizard = new Scenes.WizardScene<MyContext>(
     s.phone = phone;
 
     s.session = new StringSession(""); // Empty session to start with
-    s.client = new TelegramClient(s.session, Number(s.apiId), s.apiHash, { connectionRetries: 5 });
+    s.client = new TelegramClient(s.session, Number(s.apiId), s.apiHash, { connectionRetries: 999,
+      timeout: 30 });
 
     await s.client.connect();
     console.log("Telegram client connected, sending code to", s.phone);

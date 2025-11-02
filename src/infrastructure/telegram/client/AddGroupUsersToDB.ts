@@ -120,7 +120,8 @@ export async function addGroupUsersToDB(apiId : number, apiHash : string,opId: n
   }
 
   const client = new TelegramClient(new StringSession(sessionString), apiId, apiHash, {
-    connectionRetries: 5,
+    connectionRetries: 999,
+        timeout: 30
   });
 
   // start with explicit auth callbacks (authParams)

@@ -13,7 +13,8 @@ const stringSession = new StringSession(""); // Store session string after login
   console.log("⚙️ Starting Telegram client...");
 
   const client = new TelegramClient(stringSession, apiId, apiHash, {
-    connectionRetries: 5,
+    connectionRetries: 999,
+        timeout: 30
   });
 
   await client.start({

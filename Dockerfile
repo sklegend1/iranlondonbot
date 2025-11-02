@@ -30,12 +30,12 @@
     COPY --from=builder /app/node_modules ./node_modules
     COPY package*.json ./
     COPY prisma ./prisma
-    COPY wait-for-db.sh ./
+    # COPY wait-for-db.sh ./
 
     RUN npm ci --omit=dev \
-        && npx prisma generate \
-        && chmod +x wait-for-db.sh
+        && npx prisma generate 
+        # && chmod +x wait-for-db.sh
 
     EXPOSE 3000
 
-    CMD ["./wait-for-db.sh"]
+    # CMD ["./wait-for-db.sh"]

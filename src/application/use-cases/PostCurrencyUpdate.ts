@@ -16,7 +16,7 @@ export class PostCurrencyUpdate {
 
     // طلا و سکه
     const goldList = data.gold.slice(0, 3).map(
-      (g) => `   ✨ ${g.name}\n   💰 ${g.price.toLocaleString()} ${g.unit}\n   ${g.change_percent > 0 ? "📈" : "📉"} ${g.change_percent}%`
+      (g) => `   ✨ ${g.name}   💰 ${g.price.toLocaleString()} ${g.unit}   ${g.change_percent > 0 ? "📈" : "📉"} ${g.change_percent}%`
     );
 
     // ارزها - پوند اول و بولد!
@@ -26,12 +26,12 @@ export class PostCurrencyUpdate {
       .filter(Boolean)
       .map((c, i) => {
         const isPound = c!.symbol === "GBP";
-        const name = isPound ? `*${c!.name}*` : c!.name;
-        const price = isPound ? `*${c!.price.toLocaleString()}*` : c!.price.toLocaleString();
+        const name = `*${c!.name}*` 
+        const price = `*${c!.price.toLocaleString()}*` ;
         const change = c!.change_percent > 0 ? "📈" : "📉";
         const percent = `${change} ${c!.change_percent}%`;
         const medal = i === 0 ? "🥇" : "   ";
-        return `${medal} ${name}\n   💸 ${price} ${c!.unit}\n   ${percent}`;
+        return `${medal} ${name}   💸 ${price} ${c!.unit}  ${percent}`;
       });
 
     // رمزارزها
@@ -46,12 +46,12 @@ export class PostCurrencyUpdate {
 *💰 به‌روزرسانی لحظه‌ای بازار - ${date}*
 ⏰ ساعت: ${time}
 
-*— طلا و سکه —*
-${goldList.join("\n\n")}
-
 *— ارزهای مهم —*
 *پوند انگلیس*  
 ${fxList.join("\n\n")}
+
+*— طلا و سکه —*
+${goldList.join("\n\n")}
 
 *— رمزارزهای برتر —*
 ${cryptoList.join("\n\n")}

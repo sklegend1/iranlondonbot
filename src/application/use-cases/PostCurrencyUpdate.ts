@@ -31,7 +31,7 @@ export class PostCurrencyUpdate {
         const change = c!.change_percent > 0 ? "📈" : "📉";
         const percent = `${change} ${c!.change_percent}%`;
         const medal = i === 0 ? "🥇" : "   ";
-        return `${medal} ${name}   💸 ${price} ${c!.unit}  ${percent}`;
+        return `   ${name}   💸 ${price} ${c!.unit}  ${percent}`;
       });
 
     // رمزارزها

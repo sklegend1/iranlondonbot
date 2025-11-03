@@ -198,6 +198,33 @@ export const createAdScene = new Scenes.WizardScene<any>(
         receiptText,
       });
 
+      const unverified = await adRepo.findUnverifiedAds();
+      const unverifiedCount = unverified.length;
+      const admins = await userRepo.findAdmins();
+
+      for (const admin of admins) {
+        if (!admin.telegramId) continue;
+      
+        await ctx.telegram.sendMessage(
+          admin.telegramId,
+          `📣 یک تبلیغ جدید ثبت شد و منتظر تایید است.\n
+      🔢 تعداد تبلیغات تایید نشده: *${unverifiedCount}*
+      ✅ برای مدیریت سفارشات روی دکمه زیر کلیک کنید.`,
+          {
+            parse_mode: "Markdown",
+            ...Markup.inlineKeyboard([
+              [
+                Markup.button.callback(
+                  "🔧 مدیریت سفارشات",
+                  "ADMIN_VERIFY_ADS" // باید توی bot command handler هندل بشه
+                ),
+              ],
+            ]),
+          }
+        );
+      }
+      
+
       await ctx.reply("✅ تبلیغ ثبت شد و در انتظار تأیید ادمین است.", mainMenuKeyboard());
     } catch (err: any) {
       await ctx.reply("❌ خطا در ذخیره تبلیغ: " + (err.message || "نامشخص"));

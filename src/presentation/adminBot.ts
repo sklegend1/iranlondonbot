@@ -217,6 +217,11 @@ createAdScene.leave(async (ctx)=>{
   console.log(ctx.scene.current)
 })
 
+bot.action("ADMIN_VERIFY_ADS", async (ctx) => {
+  await ctx.answerCbQuery();
+  await ctx.scene.enter("ADMIN_REVIEW_ORDERS_SCENE"); // منتقل به صحنه مدیریت تبلیغات
+});
+
 bot.hears("➕ سفارش تبلیغ جدید",async (ctx)=>{
   console.log("Entering to create ads")
   await ctx.scene.enter("CREATE_AD_SCENE")

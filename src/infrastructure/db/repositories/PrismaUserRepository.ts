@@ -5,6 +5,10 @@ export class PrismaUserRepository {
     return prisma.user.findUnique({ where: { telegramId } });
   }
 
+  async findAdmins() {
+    return prisma.user.findMany({ where: { isAdmin: true } });
+  }
+
   async createOrUpdate(data: {
     telegramId: number;
     username?: string;

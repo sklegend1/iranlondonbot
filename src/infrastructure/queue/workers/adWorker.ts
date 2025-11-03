@@ -22,9 +22,10 @@ export const adWorker = new Worker(
     console.log(`[Worker] Listening to queue: ads`);
     const { type, ad } = job.data;
     const channelId = (await botSettingRepo.getValue("main_channel"))?.value
+    
     const telegramService = new TelegramService(
       process.env.TELEGRAM_BOT_TOKEN!,
-      channelId || process.env.TELEGRAM_CHANNEL_ID!
+      (channelId?.startsWith("@")?channelId:`@${channelId?.toLowerCase()}` ) || process.env.TELEGRAM_CHANNEL_ID!
     );
     if (type === "send") {
       console.log(`[Queue] Sending ad ${ad.id}`);

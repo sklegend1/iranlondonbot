@@ -4,6 +4,7 @@ import { MyContext } from "../types/MyContext";
 import { PrismaBotSettingRepository } from "../../infrastructure/db/repositories/PrismaBotSettingRepository";
 import { PrismaUserRepository } from "../../infrastructure/db/repositories/PrismaUserRepository";
 import { PrismaTargetGroupRepository } from "../../infrastructure/db/repositories/PrismaTargetGroupRepository";
+import { mainMenuKeyboard } from "../adminBot";
 
 const settingRepo = new PrismaBotSettingRepository();
 const userRepo = new PrismaUserRepository();
@@ -65,7 +66,7 @@ botSettingsScene.enter(async (ctx) => {
 });
 
 botSettingsScene.hears("🏠 بازگشت به منوی اصلی", async (ctx) => {
-  await ctx.reply("بازگشت به منوی اصلی ✅");
+  await ctx.reply("بازگشت به منوی اصلی ✅",mainMenuKeyboard().resize().persistent());
   await ctx.scene.leave();
 });
 

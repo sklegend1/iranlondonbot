@@ -84,7 +84,7 @@ export const adminBotStartHandler = async (ctx:any) => {
 
 
 // Helper: main menu keyboard
-function mainMenuKeyboard() {
+export function mainMenuKeyboard() {
   return Markup.keyboard([
     ["📤 دعوت اعضا"],
     ["📥 اسکرپر", "📰 ارسال خبر"],

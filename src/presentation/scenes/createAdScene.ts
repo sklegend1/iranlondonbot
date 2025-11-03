@@ -109,7 +109,10 @@ export const createAdScene = new Scenes.WizardScene<any>(
       return ctx.wizard.selectStep(5);
     }
 
-    if (text === "🏠 بازگشت به منو") return ctx.scene.leave();
+    if (text === "🏠 بازگشت به منو") {
+      await ctx.reply("بازگشت به منوی اصلی ✅",mainMenuKeyboard().resize().persistent());
+      return ctx.scene.leave();
+    }
     await ctx.reply("گزینه نامعتبر است.");
   },
 

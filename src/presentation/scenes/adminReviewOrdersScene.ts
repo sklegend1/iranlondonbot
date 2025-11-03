@@ -3,6 +3,7 @@ import { MyContext } from "../types/MyContext";
 import { PrismaAdRepository } from "../../infrastructure/db/repositories/PrismaAdRepository";
 import { format } from "date-fns-jalali";
 import { ScheduleAdJobs } from "../../application/use-cases/ScheduleAdJobs";
+import { mainMenuKeyboard } from "../adminBot";
 
 const adRepo = new PrismaAdRepository();
 const scheduler = new ScheduleAdJobs();
@@ -102,7 +103,7 @@ adminReviewOrdersScene.on("text", async (ctx) => {
 
     case "🏠 بازگشت به منوی اصلی":
       await ctx.scene.leave();
-      await ctx.reply("بازگشت به منوی اصلی ادمین.", Markup.keyboard([["📦 مدیریت سفارشات", "⚙️ تنظیمات"]]).resize());
+      await ctx.reply("بازگشت به منوی اصلی ادمین.", mainMenuKeyboard().resize());
       break;
 
     default:

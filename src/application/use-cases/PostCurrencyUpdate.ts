@@ -10,36 +10,54 @@ export class PostCurrencyUpdate {
   async execute(): Promise<void> {
     const data = await this.currencyService.fetchData();
 
+    // تاریخ و زمان
+    const date = data.gold[0].date;
+    const time = data.gold[0].time.toLocaleString("fa-IR");
+
+    // طلا و سکه
     const goldList = data.gold.slice(0, 3).map(
-      (g) => `• ${g.name}: ${g.price.toLocaleString()} ${g.unit} (${g.change_percent > 0 ? "📈" : "📉"} ${g.change_percent}%)`
+      (g) => `   ✨ ${g.name}\n   💰 ${g.price.toLocaleString()} ${g.unit}\n   ${g.change_percent > 0 ? "📈" : "📉"} ${g.change_percent}%`
     );
 
-    const fxList = data.currency
-      .filter((c) => ["USD", "EUR", "GBP", "AED"].includes(c.symbol))
-      .map(
-        (c) => `• ${c.name}: ${c.price.toLocaleString()} ${c.unit} (${c.change_percent > 0 ? "📈" : "📉"} ${c.change_percent}%)`
-      );
+    // ارزها - پوند اول و بولد!
+    const fxOrder = ["GBP", "USD", "EUR", "AED"];
+    const fxList = fxOrder
+      .map(symbol => data.currency.find(c => c.symbol === symbol))
+      .filter(Boolean)
+      .map((c, i) => {
+        const isPound = c!.symbol === "GBP";
+        const name = isPound ? `*${c!.name}*` : c!.name;
+        const price = isPound ? `*${c!.price.toLocaleString()}*` : c!.price.toLocaleString();
+        const change = c!.change_percent > 0 ? "📈" : "📉";
+        const percent = `${change} ${c!.change_percent}%`;
+        const medal = i === 0 ? "🥇" : "   ";
+        return `${medal} ${name}\n   💸 ${price} ${c!.unit}\n   ${percent}`;
+      });
 
+    // رمزارزها
     const cryptoList = data.cryptocurrency
       .filter((c) => ["BTC", "ETH", "BNB"].includes(c.symbol))
       .map(
-        (c) => `• ${c.name}: ${c.price} ${c.unit} (${c.change_percent > 0 ? "📈" : "📉"} ${c.change_percent}%)`
+        (c) => `   ${c.name}\n   🪙 ${c.price.toLocaleString()} ${c.unit}\n   ${c.change_percent > 0 ? "📈" : "📉"} ${c.change_percent}%`
       );
 
-    const message =
-`💰 **به‌روزرسانی بازار امروز**
-📅 ${data.gold[0].date} ⏰ ${data.gold[0].time.toLocaleString("fa-IR")}
+    // پیام نهایی با طراحی حرفه‌ای
+    const message = `
+*💰 به‌روزرسانی لحظه‌ای بازار - ${date}*
+⏰ ساعت: ${time}
 
-🏆 **طلا و سکه:**
-${goldList.join("\n")}
+*— طلا و سکه —*
+${goldList.join("\n\n")}
 
-💵 **ارزهای رایج:**
-${fxList.join("\n")}
+*— ارزهای مهم —*
+*پوند انگلیس*  
+${fxList.join("\n\n")}
 
-💎 **رمزارزها:**
-${cryptoList.join("\n")}
+*— رمزارزهای برتر —*
+${cryptoList.join("\n\n")}
 
-📊 منبع: TSETMC`;
+📊 منبع: TSETMC | بروزرسانی خودکار
+    `.trim();
 
     await this.telegramService.sendText(message);
   }

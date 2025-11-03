@@ -4,6 +4,7 @@ import { PrismaAdRepository } from "../../infrastructure/db/repositories/PrismaA
 import { PrismaCategoryRepository } from "../../infrastructure/db/repositories/PrismaCategoryRepository";
 import { CreateAd } from "../../application/use-cases/CreateAd";
 import { PrismaUserRepository } from "../../infrastructure/db/repositories/PrismaUserRepository";
+import { mainMenuKeyboard } from "../adminBot";
 
 const catRepo = new PrismaCategoryRepository();
 const adRepo = new PrismaAdRepository();
@@ -47,7 +48,10 @@ export const renewAdScene = new Scenes.WizardScene<any>(
     if (!ctx.message) return;
 
     if ("text" in ctx.message && ctx.message.text === "🏠 بازگشت به منو")
-      return ctx.scene.leave();
+      {
+        await ctx.reply("بازگشت به منوی اصلی ✅",mainMenuKeyboard().resize().persistent());
+        return ctx.scene.leave();
+    }
 
     let receiptUrl: string | null = null;
     let receiptText: string | null = null;

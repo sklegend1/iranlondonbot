@@ -15,7 +15,7 @@ export class TelegramService {
 
   // Send an ad post
   async sendAd(content: string, imageUrl?: string | null): Promise<number> {
-    //console.log("Sending ad to Telegram:", { content, imageUrl });
+    console.log("Sending ad to Telegram:", { content, imageUrl });
     
     try {
         
@@ -27,7 +27,7 @@ export class TelegramService {
       });
       return res.data.result.message_id;
     } catch (err: any) {
-      console.error("Failed to send ad:", err.message);
+      console.error("Failed to send ad:", err);
       throw err;
     }
   }

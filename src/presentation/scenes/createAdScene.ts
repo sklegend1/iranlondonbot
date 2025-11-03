@@ -206,7 +206,7 @@ export const createAdScene = new Scenes.WizardScene<any>(
         if (!admin.telegramId) continue;
       
         await ctx.telegram.sendMessage(
-          admin.telegramId,
+          admin.telegramId.toString(),
           `📣 یک تبلیغ جدید ثبت شد و منتظر تایید است.\n
       🔢 تعداد تبلیغات تایید نشده: *${unverifiedCount}*
       ✅ برای مدیریت سفارشات روی دکمه زیر کلیک کنید.`,

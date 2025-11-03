@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - postgres2
         
     command: node dist/presentation/allBotsRun.js
     restart: unless-stopped
@@ -29,11 +29,12 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: irukadmin
+      POSTGRES_PASSWORD: vT76kzng49+32ARUU0aH
       POSTGRES_DB: mydb
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres2_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     # healthcheck:
     #   test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
     #   interval: 5s
@@ -51,7 +52,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
-      - postgres
+      - postgres2
     restart: unless-stopped
 
   ad-worker:
@@ -62,7 +63,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - postgres2
       - redis
     command: node dist/infrastructure/queue/workers/adWorker.js
     restart: unless-stopped
@@ -76,7 +77,7 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres
+      - postgres2
     command: node dist/scripts/startQueues.js
     restart: unless-stopped
 
@@ -89,7 +90,7 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres
+      - postgres2
     command: node -e "import('./dist/infrastructure/queue/groupUserSyncScheduler.js').then(m => m.scheduleGroupUserSync())"
     restart: unless-stopped
 
@@ -102,7 +103,7 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres
+      - postgres2
     command: node -e "import('./dist/infrastructure/queue/inviteScheduler.js').then(m => m.scheduleInviteJobs())"
     restart: unless-stopped
 
@@ -115,7 +116,7 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres
+      - postgres2
     command: node -e "import('./dist/infrastructure/queue/syncTargetQueue.js').then(m => m.scheduleTargetGroupSync())"
     restart: unless-stopped
 
@@ -127,7 +128,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - postgres2
       - redis
     command: node dist/infrastructure/queue/workers/targetGroupSyncWorker.js
     restart: unless-stopped
@@ -140,7 +141,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - postgres2
       - redis
     command: node dist/infrastructure/queue/workers/groupUserSyncWorker.js
     restart: unless-stopped
@@ -153,7 +154,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      - postgres2
       - redis
     command: node dist/infrastructure/queue/workers/inviteWorker.js
     restart: unless-stopped

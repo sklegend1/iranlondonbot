@@ -38,7 +38,7 @@ export class PostCurrencyUpdate {
     const cryptoList = data.cryptocurrency
       .filter((c) => ["BTC", "ETH", "BNB"].includes(c.symbol))
       .map(
-        (c) => `   ${c.name}\n   🪙 ${c.price.toLocaleString()} ${c.unit}\n   ${c.change_percent > 0 ? "📈" : "📉"} ${c.change_percent}%`
+        (c) => `   ${c.name}   🪙 ${c.price.toLocaleString()} ${c.unit}   ${c.change_percent > 0 ? "📈" : "📉"} ${c.change_percent}%`
       );
 
     // پیام نهایی با طراحی حرفه‌ای
@@ -47,10 +47,11 @@ export class PostCurrencyUpdate {
 ⏰ ساعت: ${time}
 
 *— ارزهای مهم —*
-*پوند انگلیس*  
+ 
 ${fxList.join("\n\n")}
 
 *— طلا و سکه —*
+
 ${goldList.join("\n\n")}
 
 *— رمزارزهای برتر —*

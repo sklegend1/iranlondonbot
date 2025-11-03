@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres2
+      - postgres
         
     command: node dist/presentation/allBotsRun.js
     restart: unless-stopped
@@ -25,7 +25,7 @@ services:
 
   postgres:
     image: postgres:15-alpine
-    container_name: postgres2
+    container_name: postgres
     ports:
       - "5432:5432"
     environment:
@@ -52,7 +52,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
-      - postgres2
+      - postgres
     restart: unless-stopped
 
   ad-worker:
@@ -63,7 +63,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres2
+      - postgres
       - redis
     command: node dist/infrastructure/queue/workers/adWorker.js
     restart: unless-stopped
@@ -77,7 +77,7 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres2
+      - postgres
     command: node dist/scripts/startQueues.js
     restart: unless-stopped
 
@@ -90,7 +90,7 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres2
+      - postgres
     command: node -e "import('./dist/infrastructure/queue/groupUserSyncScheduler.js').then(m => m.scheduleGroupUserSync())"
     restart: unless-stopped
 
@@ -103,7 +103,7 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres2
+      - postgres
     command: node -e "import('./dist/infrastructure/queue/inviteScheduler.js').then(m => m.scheduleInviteJobs())"
     restart: unless-stopped
 
@@ -116,7 +116,7 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres2
+      - postgres
     command: node -e "import('./dist/infrastructure/queue/syncTargetQueue.js').then(m => m.scheduleTargetGroupSync())"
     restart: unless-stopped
 
@@ -128,7 +128,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres2
+      - postgres
       - redis
     command: node dist/infrastructure/queue/workers/targetGroupSyncWorker.js
     restart: unless-stopped
@@ -141,7 +141,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres2
+      - postgres
       - redis
     command: node dist/infrastructure/queue/workers/groupUserSyncWorker.js
     restart: unless-stopped
@@ -154,7 +154,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres2
+      - postgres
       - redis
     command: node dist/infrastructure/queue/workers/inviteWorker.js
     restart: unless-stopped

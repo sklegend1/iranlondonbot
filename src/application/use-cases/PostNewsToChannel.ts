@@ -25,7 +25,7 @@ export class PostNewsToChannel {
       const caption = `📰 *${news.title}*\n\n${news.content.slice(0,1019 - `\n\nFull article : ${news.link}📰 *${news.title}*\n\n`.length)} ${news.content.length>(1019-`\n\nFull article : ${news.link}📰 *${news.title}*\n\n`.length) ? ' ...':''}\n\nFull article : ${news.link}`;
       
       try {
-        await this.telegram.sendAd(caption, image);
+        await this.telegram.sendNews(caption, image);
         await this.newsRepo.save({ ...news, posted: true });
         console.log(`✅ Posted: ${news.title}`);
         await new Promise(resolve => setTimeout(resolve, 3000));

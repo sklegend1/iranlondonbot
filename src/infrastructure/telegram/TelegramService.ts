@@ -23,6 +23,25 @@ export class TelegramService {
         chat_id: this.channelId,
         photo: imageUrl,
         caption: content ,
+        parse_mode: "MarkdownV2",
+      });
+      return res.data.result.message_id;
+    } catch (err: any) {
+      console.error("Failed to send ad:", err);
+      throw err;
+    }
+  }
+
+  // Send an ad post
+  async sendNews(content: string, imageUrl?: string | null): Promise<number> {
+    console.log("Sending ad to Telegram:", { content, imageUrl });
+    
+    try {
+        
+      const res = await axios.post(`${this.baseUrl}/sendPhoto`, {
+        chat_id: this.channelId,
+        photo: imageUrl,
+        caption: content ,
         //parse_mode: "MarkdownV2",
       });
       return res.data.result.message_id;

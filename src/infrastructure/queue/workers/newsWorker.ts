@@ -13,6 +13,7 @@ import { ReutersScraper } from "../../scrapers/ReutersScrapper";
 import { Prisma } from '@prisma/client';
 import { BaseScraper } from '../../scrapers/BaseScraper';
 import { RSSScraper } from '../../scrapers/RSSScraper';
+import { PrismaBotSettingRepository } from '../../db/repositories/PrismaBotSettingRepository';
 
 require("dotenv").config();
 
@@ -38,15 +39,21 @@ export async function getNewsSources():Promise<BaseScraper[]>{
 
 // Setup dependencies for news processing
 
-
+const botSettingRepo = new PrismaBotSettingRepository();
 const newsRepo = new PrismaNewsRepository();
-const telegram = new TelegramService(process.env.TELEGRAM_BOT_TOKEN!, process.env.TELEGRAM_CHANNEL_ID!);
-const postNewsUseCase = new PostNewsToChannel(telegram, newsRepo);
+
 
 // Create worker
 export const newsWorker = new Worker(
   "news",
   async (job) => {
+    const channelId = (await botSettingRepo.getValue("main_channel"))?.value
+    
+    const telegram = new TelegramService(
+      process.env.TELEGRAM_BOT_TOKEN!,
+      (channelId?.startsWith("@")?channelId:`@${channelId?.toLowerCase()}` ) || process.env.TELEGRAM_CHANNEL_ID!
+    );
+    const postNewsUseCase = new PostNewsToChannel(telegram, newsRepo);
     const newsSources = await getNewsSources();
     const aggregator = new NewsAggregator(newsSources);
     console.log(`[NewsWorker] job received: ${job.name}`);

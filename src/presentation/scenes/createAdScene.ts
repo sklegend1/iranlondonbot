@@ -199,6 +199,11 @@ export const createAdScene = new Scenes.WizardScene<any>(
       });
 
       const unverified = await adRepo.findUnverifiedAds();
+      if(!unverified) 
+      {
+        await ctx.reply("✅ تبلیغ ثبت شد و در انتظار تأیید ادمین است.", mainMenuKeyboard());
+        return ctx.scene.leave();
+      }
       const unverifiedCount = unverified.length;
       const admins = await userRepo.findAdmins();
 

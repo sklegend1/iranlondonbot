@@ -96,7 +96,7 @@ export const createAdScene = new Scenes.WizardScene<any>(
       ctx.wizard.state.endAt = endAt;
       const { categoryPrice } = ctx.wizard.state as any;
     await ctx.reply(
-      `💳 مبلغ پرداخت برای این دسته‌بندی: *${categoryPrice} *\n\n ${msg?.value} \n\n رسید پرداخت (عکس یا متن) را ارسال نمایید`,
+      `💳 مبلغ پرداخت برای این دسته‌بندی: *${categoryPrice} £*\n\n ${msg?.value} \n\n رسید پرداخت (عکس یا متن) را ارسال نمایید`,
       { parse_mode: "Markdown", ...mainMenuKeyboard() }
     );
       return ctx.wizard.selectStep(6);
@@ -147,13 +147,13 @@ export const createAdScene = new Scenes.WizardScene<any>(
       await ctx.reply("❌ فرمت نادرست. مثال: 2025-10-21 18:30");
       return;
     }
-
+    const msg = await botSettingRepo.getValue("ad_message");
     const startAt = date;
     const endAt = new Date(startAt.getTime() + 5 * 60 * 1000);
     ctx.wizard.state.startAt = startAt;
     ctx.wizard.state.endAt = endAt;
     await ctx.reply(
-      `💳 مبلغ پرداخت برای این دسته‌بندی: *${categoryPrice} تومان*\n\nلطفاً مبلغ را به شماره کارت زیر واریز کنید و سپس رسید پرداخت (عکس یا متن) را ارسال نمایید.\n\n🏦 1234-5678-9012-3456 به نام "ربات تبلیغات"`,
+      `💳 مبلغ پرداخت برای این دسته‌بندی: *${categoryPrice} £*\n\n ${msg?.value} \n\n رسید پرداخت (عکس یا متن) را ارسال نمایید`,
       { parse_mode: "Markdown", ...mainMenuKeyboard() }
     );
     return ctx.wizard.next();

@@ -203,4 +203,4 @@ volumes:
 
 networks:
   internal_net:
-  driver: bridge
+    driver: bridge

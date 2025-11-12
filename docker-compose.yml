@@ -14,20 +14,24 @@ services:
         
     command: node dist/presentation/allBotsRun.js
     restart: unless-stopped
+    networks:
+      - internal_net
 
   redis:
     image: redis:7-alpine
     container_name: redis
-    ports:
-      - "6379:6379"
-    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    networks:
+      - internal_net
+    volumes:
+      - redis_data:/data
+    command: ["redis-server","--requirepass","bCTH1qmGpI2TePJfs", "--save", "60", "1", "--loglevel", "warning"]
     restart: unless-stopped
 
   postgres:
     image: postgres:15-alpine
     container_name: postgres
-    ports:
-      - "5432:5432"
+    networks:
+      - internal_net
     environment:
       POSTGRES_USER: irukadmin
       POSTGRES_PASSWORD: vT76kzng49+32ARUU0aH
@@ -50,10 +54,12 @@ services:
       - "5050:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_PASSWORD: 8PRsM7aFIh/GSdbm
     depends_on:
       - postgres
     restart: unless-stopped
+    networks:
+      - internal_net
 
   ad-worker:
     build:
@@ -67,6 +73,8 @@ services:
       - redis
     command: node dist/infrastructure/queue/workers/adWorker.js
     restart: unless-stopped
+    networks:
+      - internal_net
 
   queue-scheduler:
     build:
@@ -80,6 +88,8 @@ services:
       - postgres
     command: node dist/scripts/startQueues.js
     restart: unless-stopped
+    networks:
+      - internal_net
 
   group-user-sync-scheduler:
     build:
@@ -93,6 +103,8 @@ services:
       - postgres
     command: node -e "import('./dist/infrastructure/queue/groupUserSyncScheduler.js').then(m => m.scheduleGroupUserSync())"
     restart: unless-stopped
+    networks:
+      - internal_net
 
   invite-scheduler:
     build:
@@ -106,6 +118,8 @@ services:
       - postgres
     command: node -e "import('./dist/infrastructure/queue/inviteScheduler.js').then(m => m.scheduleInviteJobs())"
     restart: unless-stopped
+    networks:
+      - internal_net
 
   target-sync-scheduler:
     build:
@@ -119,6 +133,8 @@ services:
       - postgres
     command: node -e "import('./dist/infrastructure/queue/syncTargetQueue.js').then(m => m.scheduleTargetGroupSync())"
     restart: unless-stopped
+    networks:
+      - internal_net
 
   target-worker:
     build:
@@ -132,6 +148,8 @@ services:
       - redis
     command: node dist/infrastructure/queue/workers/targetGroupSyncWorker.js
     restart: unless-stopped
+    networks:
+      - internal_net
 
   group-sync-worker:
     build:
@@ -145,6 +163,8 @@ services:
       - redis
     command: node dist/infrastructure/queue/workers/groupUserSyncWorker.js
     restart: unless-stopped
+    networks:
+      - internal_net
 
   invite-worker:
     build:
@@ -158,6 +178,8 @@ services:
       - redis
     command: node dist/infrastructure/queue/workers/inviteWorker.js
     restart: unless-stopped
+    networks:
+      - internal_net
 
   bullboard:
     build:
@@ -172,6 +194,13 @@ services:
     depends_on:
       - redis
     restart: unless-stopped
+    networks:
+      - internal_net
 
 volumes:
   postgres_data:
+  redis_data:
+
+networks:
+  internal_net:
+  driver: bridge

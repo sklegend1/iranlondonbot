@@ -20,7 +20,7 @@ export async function scheduleInviteJobs() {
       { target: group.key },
       {
         repeat: { every: (Number(process.env.INVITE_WAITING_TIME!)||24) * 60 * 60 * 1000 }, // هر ۶ ساعت
-        removeOnComplete: true,
+        removeOnComplete: false,
         removeOnFail: false,
       }
     );

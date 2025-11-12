@@ -5,7 +5,7 @@ import { MyContext } from "../types/MyContext";
 import { PrismaCategoryRepository } from "../../infrastructure/db/repositories/PrismaCategoryRepository";
 import { PrismaAdRepository } from "../../infrastructure/db/repositories/PrismaAdRepository";
 import { CreateAd } from "../../application/use-cases/CreateAd";
-import { ScheduleAdJobs } from "../../application/use-cases/ScheduleAdJobs";
+import { ScheduleAdJobs } from "../../infrastructure/queue/ScheduleAdJobs";
 import { Category } from "@prisma/client";
 import { PrismaUserRepository } from "../../infrastructure/db/repositories/PrismaUserRepository";
 import { PrismaBotSettingRepository } from "../../infrastructure/db/repositories/PrismaBotSettingRepository";

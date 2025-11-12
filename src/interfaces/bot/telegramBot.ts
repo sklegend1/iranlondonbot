@@ -7,7 +7,7 @@ import { session } from "telegraf";
 
 import { PrismaAdRepository } from "../../infrastructure/db/repositories/PrismaAdRepository";
 import { CreateAd } from "../../application/use-cases/CreateAd";
-import { ScheduleAdJobs } from "../../application/use-cases/ScheduleAdJobs";
+import { ScheduleAdJobs } from "../../infrastructure/queue/ScheduleAdJobs";
 import { PrismaUserRepository } from "../../infrastructure/db/repositories/PrismaUserRepository";
 import { PrismaCategoryRepository } from "../../infrastructure/db/repositories/PrismaCategoryRepository";
 import { Category } from "../../domain/entities/Category";

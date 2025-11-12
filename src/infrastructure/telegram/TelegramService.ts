@@ -79,4 +79,31 @@ export class TelegramService {
       console.error("Failed to delete ad:", err.message);
     }
   }
+
+  // Pin Ad Message
+  async pinAd(messageId: number): Promise<void> {
+    try {
+      const res = await axios.post(`${this.baseUrl}/pinChatMessage`, {
+        chat_id: this.channelId,
+        message_id: messageId,
+        // disable_notification: true, //
+      });
+      console.log("Pin response:", res.data);
+    } catch (err: any) {
+      console.error("Failed to pin ad:", err.message);
+    }
+  }
+
+  // Unpin Ad Message
+  async unpinAd(messageId: number): Promise<void> {
+    try {
+      const res = await axios.post(`${this.baseUrl}/unpinChatMessage`, {
+        chat_id: this.channelId,
+        message_id: messageId,
+      });
+      console.log("Unpin response:", res.data);
+    } catch (err: any) {
+      console.error("Failed to unpin ad:", err.message);
+    }
+  }
 }

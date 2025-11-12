@@ -1,4 +1,4 @@
-import { adQueue } from "../../infrastructure/queue/adQueue";
+import { adQueue } from "./adQueue";
 import { Ad } from "../../domain/entities/Ad";
 
 export class ScheduleAdJobs {

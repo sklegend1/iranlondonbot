@@ -9,7 +9,7 @@ export async function scheduleGroupUserSync() {
     {},
     {
       repeat: { every: (Number(process.env.SYNC_USERS_WAITING_TIME!)||48) * 60 * 60 * 1000 }, // هر ۲ ساعت
-      removeOnComplete: true,
+      removeOnComplete: false,
       removeOnFail: false,
       
     }

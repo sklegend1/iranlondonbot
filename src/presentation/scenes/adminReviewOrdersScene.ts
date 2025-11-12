@@ -2,7 +2,7 @@ import { Scenes, Markup } from "telegraf";
 import { MyContext } from "../types/MyContext";
 import { PrismaAdRepository } from "../../infrastructure/db/repositories/PrismaAdRepository";
 import { format } from "date-fns-jalali";
-import { ScheduleAdJobs } from "../../application/use-cases/ScheduleAdJobs";
+import { ScheduleAdJobs } from "../../infrastructure/queue/ScheduleAdJobs";
 import { mainMenuKeyboard } from "../adminBot";
 
 const adRepo = new PrismaAdRepository();

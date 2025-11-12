@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { PrismaAdRepository } from "../../../infrastructure/db/repositories/PrismaAdRepository";
 import { CreateAd } from "../../../application/use-cases/CreateAd";
-import { ScheduleAdJobs } from "../../../application/use-cases/ScheduleAdJobs";
+import { ScheduleAdJobs } from "../../../infrastructure/queue/ScheduleAdJobs";
 
 const adRepository = new PrismaAdRepository();
 const createAdUseCase = new CreateAd(adRepository);

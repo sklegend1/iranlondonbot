@@ -209,24 +209,29 @@ export const createAdScene = new Scenes.WizardScene<any>(
 
       for (const admin of admins) {
         if (!admin.telegramId) continue;
-      
-        await ctx.telegram.sendMessage(
-          admin.telegramId.toString(),
-          `📣 یک تبلیغ جدید ثبت شد و منتظر تایید است.\n
-      🔢 تعداد تبلیغات تایید نشده: *${unverifiedCount}*
-      ✅ برای مدیریت سفارشات روی دکمه زیر کلیک کنید.`,
-          {
-            parse_mode: "Markdown",
-            ...Markup.inlineKeyboard([
-              [
-                Markup.button.callback(
-                  "🔧 مدیریت سفارشات",
-                  "ADMIN_VERIFY_ADS" // باید توی bot command handler هندل بشه
-                ),
-              ],
-            ]),
+          try {
+            
+          
+              await ctx.telegram.sendMessage(
+                admin.telegramId.toString(),
+                `📣 یک تبلیغ جدید ثبت شد و منتظر تایید است.\n
+            🔢 تعداد تبلیغات تایید نشده: *${unverifiedCount}*
+            ✅ برای مدیریت سفارشات روی دکمه زیر کلیک کنید.`,
+                {
+                  parse_mode: "Markdown",
+                  ...Markup.inlineKeyboard([
+                    [
+                      Markup.button.callback(
+                        "🔧 مدیریت سفارشات",
+                        "ADMIN_VERIFY_ADS" // باید توی bot command handler هندل بشه
+                      ),
+                    ],
+                  ]),
+                }
+              );
+            } catch (error) {
+              console.log(`[Notification] Failed to notify admin ${admin.id} about new ad:`, error);
           }
-        );
       }
       
 

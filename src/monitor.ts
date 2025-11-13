@@ -7,6 +7,7 @@ import { currencyQueue } from "./infrastructure/queue/currencyQueue";
 import { targetGroupSync } from "./infrastructure/queue/syncTargetQueue";
 import { inviteQueue } from "./infrastructure/queue/inviteScheduler";
 import { groupUserSyncQueue } from "./infrastructure/queue/groupUserSyncQueue";
+import { adQueue } from "./infrastructure/queue/adQueue";
 
 const app = express();
 const serverAdapter = new ExpressAdapter();
@@ -16,6 +17,7 @@ createBullBoard({
   queues: [
     new BullMQAdapter(newsQueue),
     new BullMQAdapter(currencyQueue),
+    new BullMQAdapter(adQueue),
     new BullMQAdapter(targetGroupSync),
     new BullMQAdapter(inviteQueue),
     new BullMQAdapter(groupUserSyncQueue)

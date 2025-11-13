@@ -28,8 +28,9 @@ export class ScheduleAdJobs {
   }
 
   async executePin(ad: Ad) {
-    const delayUntilStart =  Date.now();
-    const delayUntilEnd = Date.now() + (7 * 24 * 60 * 60 * 1000); // one week later
+    const delayUntilStart =  0;
+    const pinDuration = 7 * 24 * 60 * 60 * 1000;// one week 
+    const delayUntilEnd = delayUntilStart + pinDuration; 
 
     console.log(`[Scheduler] Ad ${ad.id} will be pined in ${delayUntilStart / 1000}s`);
     console.log(`[Scheduler] Ad ${ad.id} will be unpined in ${delayUntilEnd / 1000}s`);

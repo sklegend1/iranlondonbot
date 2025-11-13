@@ -1,3 +1,4 @@
+import { UpdateAd } from './../../application/use-cases/UpdateAd';
 import { adQueue } from "./adQueue";
 import { Ad } from "../../domain/entities/Ad";
 
@@ -25,4 +26,29 @@ export class ScheduleAdJobs {
       { delay: Math.max(0,delayUntilEnd), attempts: 3 }
     );
   }
+
+  async executePin(ad: Ad) {
+    const delayUntilStart =  Date.now();
+    const delayUntilEnd = Date.now() + (7 * 24 * 60 * 60 * 1000); // one week later
+
+    console.log(`[Scheduler] Ad ${ad.id} will be pined in ${delayUntilStart / 1000}s`);
+    console.log(`[Scheduler] Ad ${ad.id} will be unpined in ${delayUntilEnd / 1000}s`);
+
+    console.log(`[Scheduler] Connected to Redis for queue: ${adQueue.name}`);
+    // Schedule "Pin"
+    await adQueue.add(
+      "pinAd",
+      { type: "pin", ad },
+      { delay: Math.max(0,delayUntilStart), attempts: 3 }
+    );
+    console.log(`[Scheduler] Job "pinAd" added for Ad ${ad.id} with delay ${delayUntilStart}ms`);
+
+    // Schedule "Unpin"
+    await adQueue.add(
+      "unpinAd",
+      { type: "unpin", ad },
+      { delay: Math.max(0,delayUntilEnd), attempts: 3 }
+    );
+  }
+
 }

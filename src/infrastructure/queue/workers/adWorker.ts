@@ -44,7 +44,7 @@ export const adWorker = new Worker(
             userId: ad.userId,
             startAt: ad.startAt,
             endAt: ad.endAt,
-            verified: ad.verified,
+            verified: true,
             receiptText: ad.receiptText,
             receiptUrl:   ad.receiptUrl,
           });

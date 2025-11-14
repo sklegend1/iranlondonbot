@@ -40,9 +40,9 @@ export class UpdateAd {
       userId: request.userId,
       startAt: request.startAt,
       endAt: request.endAt,
-      verified: false, // Reset to unverified on update
-      receiptText: null,
-      receiptUrl: null,
+      verified: request.verified, 
+      receiptText: request.receiptText,
+      receiptUrl: request.receiptUrl,
 
     };
     

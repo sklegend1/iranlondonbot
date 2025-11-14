@@ -4,8 +4,10 @@ import { PrismaAdRepository } from "../../infrastructure/db/repositories/PrismaA
 import { format } from "date-fns-jalali";
 import { ScheduleAdJobs } from "../../infrastructure/queue/ScheduleAdJobs";
 import { mainMenuKeyboard } from "../adminBot";
+import { UpdateAd } from "../../application/use-cases/UpdateAd";
 
 const adRepo = new PrismaAdRepository();
+const updateAdUsecase = new UpdateAd(adRepo)
 const scheduler = new ScheduleAdJobs();
 export const adminReviewOrdersScene = new Scenes.BaseScene<any>("ADMIN_REVIEW_ORDERS_SCENE");
 
@@ -79,7 +81,8 @@ adminReviewOrdersScene.on("text", async (ctx) => {
 
   switch (text) {
     case "✅ تأیید تبلیغ":
-      await adRepo.update( {...ad , verified: true });
+      //await adRepo.update( {...ad , verified: true });
+      await updateAdUsecase.execute({...ad , verified: true })
       await scheduler.execute(ad);
       await ctx.reply("✅ تبلیغ تأیید و فعال شد.");
       i++;

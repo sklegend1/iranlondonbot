@@ -100,6 +100,21 @@ function backToMenuKeyboard() {
   return Markup.keyboard([["↩️ بازگشت به منو"]]).resize();
 }
 
+async function ensureAdminAccess(ctx: MyContext): Promise<boolean> {
+  const fromId = ctx.from?.id?.toString() ?? "";
+  const curUser = ctx.from?.id ? await userRepo.findByTelegramId(ctx.from.id) : null;
+  const hasAccess = fromId === ADMIN_ID || (curUser?.isAdmin ?? false);
+
+  if (hasAccess) {
+    return true;
+  }
+
+  
+  await ctx.scene.enter("NORMAL_USER_SCENE");
+  
+  return false;
+}
+
 async function showUserOrders(ctx: MyContext) {
   const userId = ctx.from?.id;
   if (!userId) {
@@ -224,6 +239,9 @@ createAdScene.leave(async (ctx)=>{
 
 bot.action("ADMIN_VERIFY_ADS", async (ctx) => {
   await ctx.answerCbQuery();
+  if (!(await ensureAdminAccess(ctx))) {
+    return;
+  }
   await ctx.scene.enter("ADMIN_REVIEW_ORDERS_SCENE"); // منتقل به صحنه مدیریت تبلیغات
 });
 
@@ -635,47 +653,31 @@ stage.register(manageOperatorScene);
 // ---------- Menu handlers ----------
 
 bot.hears("👥 اپراتورها", async (ctx) => {
-  const fromId = ctx.from?.id?.toString() ?? "";
-  const curUser = await userRepo.findByTelegramId(ctx.from?.id);
-
-  if (fromId !== ADMIN_ID && (!curUser || !curUser.isAdmin)) {
-    await ctx.reply("⛔️ دسترسی شما مجاز نیست.");
+  if (!(await ensureAdminAccess(ctx))) {
     return;
   }
   await ctx.reply(
     "مدیریت اپراتورها:\nیکی از گزینه‌ها را انتخاب کنید:",
     Markup.keyboard([["👥 مدیریت اپراتورها", "➕ افزودن اپراتور جدید"], ["↩️ بازگشت به منو"]]).resize()
   );
-})
+});
 
 bot.hears("👥 مدیریت اپراتورها", async (ctx) => {
-  const fromId = ctx.from?.id?.toString() ?? "";
-  const curUser = await userRepo.findByTelegramId(ctx.from?.id);
-
-  if (fromId !== ADMIN_ID && (!curUser || !curUser.isAdmin)) {
-    await ctx.reply("⛔️ دسترسی شما مجاز نیست.");
+  if (!(await ensureAdminAccess(ctx))) {
     return;
   }
   await ctx.scene.enter("MANAGE_OPERATOR_SCENE");
 });
 
 bot.hears("➕ افزودن اپراتور جدید", async (ctx) => {
-  const fromId = ctx.from?.id?.toString() ?? "";
-  const curUser = await userRepo.findByTelegramId(ctx.from?.id);
-
-  if (fromId !== ADMIN_ID && (!curUser || !curUser.isAdmin)) {
-    await ctx.reply("⛔️ دسترسی شما مجاز نیست.");
+  if (!(await ensureAdminAccess(ctx))) {
     return;
   }
   await ctx.scene.enter("ADD_OPERATOR_WIZARD");
 });
 
 bot.hears("📤 دعوت اعضا", async (ctx) => {
-  const fromId = ctx.from?.id?.toString() ?? "";
-  const curUser = await userRepo.findByTelegramId(ctx.from?.id);
-
-  if (fromId !== ADMIN_ID && (!curUser || !curUser.isAdmin)) {
-    await ctx.reply("⛔️ دسترسی شما مجاز نیست.");
+  if (!(await ensureAdminAccess(ctx))) {
     return;
   }
 
@@ -695,11 +697,7 @@ bot.hears("📤 دعوت اعضا", async (ctx) => {
 });
 
 bot.hears(["🟢 فعال کن", "🔴 غیرفعال کن"], async (ctx) => {
-  const fromId = ctx.from?.id?.toString() ?? "";
-  const curUser = await userRepo.findByTelegramId(ctx.from?.id);
-
-  if (fromId !== ADMIN_ID && (!curUser || !curUser.isAdmin)) {
-    await ctx.reply("⛔️ دسترسی شما مجاز نیست.");
+  if (!(await ensureAdminAccess(ctx))) {
     return;
   }
 
@@ -710,26 +708,44 @@ bot.hears(["🟢 فعال کن", "🔴 غیرفعال کن"], async (ctx) => {
 });
 
 bot.hears("📥 اسکرپر", async (ctx) => {
-  ctx.scene.enter("SCRAPER_SCENE");
+  if (!(await ensureAdminAccess(ctx))) {
+    return;
+  }
+  await ctx.scene.enter("SCRAPER_SCENE");
 });
 
 bot.hears("📰 ارسال خبر", async (ctx) => {
+  if (!(await ensureAdminAccess(ctx))) {
+    return;
+  }
   await ctx.reply("🚧 این بخش در حال توسعه است.", mainMenuKeyboard());
 });
 
 bot.hears("📦 مدیریت سفارشات", async (ctx) => {
+  if (!(await ensureAdminAccess(ctx))) {
+    return;
+  }
   await ctx.scene.enter("ADMIN_REVIEW_ORDERS_SCENE");
 });
 
 bot.hears("⏰ زمان‌بندی", async (ctx) => {
+  if (!(await ensureAdminAccess(ctx))) {
+    return;
+  }
   await ctx.reply("🚧 این بخش در حال توسعه است.", mainMenuKeyboard());
 });
 
 bot.hears("⚙️ تنظیمات عمومی", async (ctx) => {
-  ctx.scene.enter("BOT_SETTINGS_SCENE");
+  if (!(await ensureAdminAccess(ctx))) {
+    return;
+  }
+  await ctx.scene.enter("BOT_SETTINGS_SCENE");
 });
 
 bot.hears("↩️ بازگشت به منو", async (ctx) => {
+  if (!(await ensureAdminAccess(ctx))) {
+    return;
+  }
   ctx.session = {};
   await ctx.reply("بازگشت به منوی اصلی.", mainMenuKeyboard());
 });

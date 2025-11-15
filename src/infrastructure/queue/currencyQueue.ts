@@ -4,7 +4,7 @@ import { redisOptions } from "./queueClient";
 
 export const currencyQueue = new Queue("currency", { connection: redisOptions });
 
-export async function scheduleRepeatableCurrencyJob(cronExpr = "0 * * * *") {
+export async function scheduleRepeatableCurrencyJob(cronExpr = "0 */3 * * *") {
   // default: every hour at :00
   await currencyQueue.add(
     "fetch-latest",

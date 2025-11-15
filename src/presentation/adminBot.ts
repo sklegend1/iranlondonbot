@@ -14,6 +14,7 @@ import { PrismaUserRepository } from "../infrastructure/db/repositories/PrismaUs
 import { format } from "date-fns-jalali";
 import { PrismaAdRepository } from "../infrastructure/db/repositories/PrismaAdRepository";
 import { renewAdScene } from "./scenes/renewAdScene";
+import { renewPinAdScene } from "./scenes/renewPinAdScene";
 import { adminReviewOrdersScene } from "./scenes/adminReviewOrdersScene";
 import { botSettingsScene } from "./scenes/botSettingsScene";
 
@@ -203,7 +204,11 @@ bot.start(adminBotStartHandler);
 normalUserScene.enter(async (ctx)=>{
     await ctx.reply("گزینه مورد نظر را انتخاب کنید",
       Markup.keyboard(
-      [["➕ سفارش تبلیغ جدید"],["📋 سوابق سفارشات","🔁 تمدید سفارش"]]
+      [
+        ["➕ سفارش تبلیغ جدید"],
+        ["📋 سوابق سفارشات","🔁 تمدید سفارش"],
+        ["📌 درخواست پین تبلیغ"]
+      ]
     ).resize().persistent()
     )
 })
@@ -237,9 +242,14 @@ bot.hears("🔁 تمدید سفارش",async (ctx)=>{
     return;
 })
 
+bot.hears("📌 درخواست پین تبلیغ", async (ctx) => {
+  await ctx.scene.enter("RENEW_PIN_AD_SCENE");
+});
+
 stage.register(createAdScene)
 stage.register(normalUserScene)
 stage.register(renewAdScene)
+stage.register(renewPinAdScene)
 stage.register(adminReviewOrdersScene)
 stage.register(botSettingsScene);
 // Scraper Wizard

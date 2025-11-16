@@ -49,8 +49,9 @@ export const renewAdScene = new Scenes.WizardScene<any>(
 
     if ("text" in ctx.message && ctx.message.text === "🏠 بازگشت به منو")
       {
-        await ctx.reply("بازگشت به منوی اصلی ✅",mainMenuKeyboard().resize().persistent());
-        return ctx.scene.leave();
+        //await ctx.reply("بازگشت به منوی اصلی ✅",mainMenuKeyboard().resize().persistent());
+        await ctx.scene.leave();
+        return ctx.scene.enter("RENEW_AD_SCENE");
     }
 
     let receiptUrl: string | null = null;

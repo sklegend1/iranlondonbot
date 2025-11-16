@@ -5,11 +5,13 @@ import { PrismaCategoryRepository } from "../../infrastructure/db/repositories/P
 import { CreateAd } from "../../application/use-cases/CreateAd";
 import { PrismaUserRepository } from "../../infrastructure/db/repositories/PrismaUserRepository";
 import { mainMenuKeyboard } from "../adminBot";
+import { PrismaBotSettingRepository } from "../../infrastructure/db/repositories/PrismaBotSettingRepository";
 
 const catRepo = new PrismaCategoryRepository();
 const adRepo = new PrismaAdRepository();
 const createAd = new CreateAd(adRepo);
 const userRepo = new PrismaUserRepository();
+const botSettingRepo = new PrismaBotSettingRepository();
 export const renewAdScene = new Scenes.WizardScene<any>(
   "RENEW_AD_SCENE",
 
@@ -26,13 +28,13 @@ export const renewAdScene = new Scenes.WizardScene<any>(
     }
     const cats = await catRepo.findAll();
     ctx.wizard.state.categories = cats;
-    
+    const msg = await botSettingRepo.getValue("ad_message");
     const adId = Number(matchedId[1]);
     const ad = await adRepo.findById(adId);
     const categoryPrice = cats.find(c => c.id === ad?.categoryId)?.price || 0;
     ctx.wizard.state.adId = adId;
     await ctx.reply(
-      `💳 مبلغ پرداخت برای این دسته‌بندی: *${categoryPrice} $*\n\nلطفاً مبلغ را به شماره کارت زیر واریز کنید و سپس رسید پرداخت (عکس یا متن) را ارسال نمایید.\n\n🏦 1234-5678-9012-3456 به نام "ربات تبلیغات"`,
+      `💳 مبلغ پرداخت برای این دسته‌بندی: *${categoryPrice} £*\n\n ${msg?.value} \n\n رسید پرداخت (عکس یا متن) را ارسال نمایید`,
       Markup.keyboard([
         
         ["🏠 بازگشت به منو"],

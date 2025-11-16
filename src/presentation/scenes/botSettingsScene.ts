@@ -190,6 +190,13 @@ botSettingsScene.on("text", async (ctx) => {
         }
         if (text === "📩 پیام خوش‌آمد" || text === "📢 پیام پرداخت تبلیغات") {
             const key = text === "📩 پیام خوش‌آمد" ? "welcome_message" : "ad_message";
+            const existing = await settingRepo.getValue(key);
+            if (existing) {
+                await ctx.reply(`پیام فعلی:\n\n${existing.value}\n\nبرای تغییر، پیام جدید را ارسال کن.`);
+                }
+                else {
+                await ctx.reply("فعلاً پیامی تنظیم نشده است. ");
+                }
             await ctx.reply(`لطفاً متن پیام خودکار (${text}) را ارسال کن:`);
             ctx.scene.state.waitingFor = key;
         } else {

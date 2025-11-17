@@ -23,7 +23,7 @@ export class TelegramService {
         chat_id: this.channelId,
         photo: imageUrl,
         caption: content ,
-        parse_mode: "MarkdownV2",
+        //parse_mode: "MarkdownV2",
       });
       return res.data.result.message_id;
     } catch (err: any) {

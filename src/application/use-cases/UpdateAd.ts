@@ -27,9 +27,9 @@ export class UpdateAd {
     if (request.startAt >= request.endAt) {
       throw new Error("Start date must be before end date");
     }
-    if (!request.messageId) {
-      throw new Error("Ad MessageID is required for update");
-    }
+    //if (!request.messageId) {
+      //throw new Error("Ad MessageID is required for update");
+    //}
 
     const ad: Ad = {
         id: request.id, // Use messageId as the unique identifier for update

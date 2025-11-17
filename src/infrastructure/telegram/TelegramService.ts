@@ -58,7 +58,7 @@ export class TelegramService {
       const res = await axios.post(`${this.baseUrl}/sendMessage`, {
         chat_id: this.channelId,
         text: content,
-        parse_mode: "Markdown",
+        //parse_mode: "Markdown",
       });
       return res.data.result.message_id;
     } catch (err: any) {

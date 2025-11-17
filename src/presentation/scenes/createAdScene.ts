@@ -97,14 +97,14 @@ export const createAdScene = new Scenes.WizardScene<any>(
       const { categoryPrice } = ctx.wizard.state as any;
     await ctx.reply(
       `💳 مبلغ پرداخت برای این دسته‌بندی: *${categoryPrice} £*\n\n ${msg?.value} \n\n رسید پرداخت (عکس یا متن) را ارسال نمایید`,
-      { parse_mode: "Markdown", ...mainMenuKeyboard() }
+      {  ...mainMenuKeyboard() }
     );
       return ctx.wizard.selectStep(6);
     }
 
     if (text === "🗓 زمان‌بندی دستی") {
       await ctx.reply("🕐 لطفاً زمان انتشار را به فرمت زیر بنویس:\n\n`YYYY-MM-DD HH:mm`", {
-        parse_mode: "Markdown",
+        //parse_mode: "Markdown",
       });
       return ctx.wizard.selectStep(5);
     }
@@ -154,7 +154,8 @@ export const createAdScene = new Scenes.WizardScene<any>(
     ctx.wizard.state.endAt = endAt;
     await ctx.reply(
       `💳 مبلغ پرداخت برای این دسته‌بندی: *${categoryPrice} £*\n\n ${msg?.value} \n\n رسید پرداخت (عکس یا متن) را ارسال نمایید`,
-      { parse_mode: "Markdown", ...mainMenuKeyboard() }
+      { //parse_mode: "Markdown",
+         ...mainMenuKeyboard() }
     );
     return ctx.wizard.next();
   },
